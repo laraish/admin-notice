@@ -1,0 +1,30 @@
+{
+    "name": "laraish/admin-notice",
+    "description": "A simple helper for admin notice on WordPress admin pages.",
+    "keywords": [
+        "dough",
+        "WordPress"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/laraish/admin-notice",
+    "support": {
+        "issues": "https://github.com/laraish/admin-notice/issues",
+        "source": "https://github.com/laraish/admin-notice"
+    },
+    "authors": [
+        {
+            "name": "yaquawa",
+            "email": "yaquawa@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laraish\\AdminNotice\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
