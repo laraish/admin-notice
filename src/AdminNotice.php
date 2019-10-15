@@ -7,17 +7,8 @@ class AdminNotice
     public const TRANSIENT_KEY = 'laraish_notices';
     public const DISMISS_ACTION = 'laraish_dismiss';
 
-    /**
-     * The accumulated notices.
-     *
-     * @var array
-     */
-    protected static $notices = [];
-
     public static function init()
     {
-        static::$notices = get_transient(static::TRANSIENT_KEY) ?: [];
-
         add_action('admin_notices', function () {
             static::outputNotices();
         });
@@ -40,6 +31,34 @@ class AdminNotice
                 true
             );
         });
+    }
+
+    /**
+     * Get notices from transient.
+     * @return array
+     */
+    protected static function getNotices(): array
+    {
+        return get_transient(static::TRANSIENT_KEY) ?: [];
+    }
+
+    /**
+     * Set notices to transient.
+     * @param  array  $notices
+     * @return bool
+     */
+    protected static function updateNotices(array $notices): bool
+    {
+        return set_transient(static::TRANSIENT_KEY, $notices, YEAR_IN_SECONDS);
+    }
+
+    /**
+     * Delete all notices from transient.
+     * @return bool
+     */
+    public static function clearAll(): bool
+    {
+        return delete_transient(static::TRANSIENT_KEY);
     }
 
     /**
@@ -76,7 +95,8 @@ class AdminNotice
 
         // update the notice with the given id if possible
         $updated = false;
-        foreach (static::$notices as &$notice) {
+        $notices = static::getNotices();
+        foreach ($notices as &$notice) {
             if ($notice['id'] && $notice['id'] === $id) {
                 $notice = $noticeToBeAdded;
                 $updated = true;
@@ -85,10 +105,10 @@ class AdminNotice
         }
 
         if (!$updated) {
-            static::$notices[] = $noticeToBeAdded;
+            $notices[] = $noticeToBeAdded;
         }
 
-        set_transient(static::TRANSIENT_KEY, static::$notices, YEAR_IN_SECONDS);
+        static::updateNotices($notices);
     }
 
     public static function success($message, $isDismissible = true, $noticeId = null)
@@ -116,7 +136,7 @@ class AdminNotice
      */
     protected static function outputNotices()
     {
-        foreach (static::$notices as $notice) {
+        foreach (static::getNotices() as $notice) {
             $class = 'notice notice-'.$notice['type'].($notice['isDismissible'] ? ' is-dismissible' : '');
             $message = $notice['message'];
             $noticeId = $notice['id'];
@@ -131,18 +151,18 @@ class AdminNotice
 
     protected static function removeOneTimeNotice()
     {
-        $notices = array_filter(static::$notices, function ($notice) {
+        $notices = array_filter(static::getNotices(), function ($notice) {
             return $notice['id'];
         });
 
-        set_transient(static::TRANSIENT_KEY, $notices, YEAR_IN_SECONDS);
+        static::updateNotices($notices);
     }
 
     protected static function removePersistentNotice(string $noticeId)
     {
         $notices = [];
 
-        foreach (static::$notices as $notice) {
+        foreach (static::getNotices() as $notice) {
             if (isset($notice['id']) && $notice['id'] === $noticeId) {
                 continue;
             }
@@ -150,11 +170,6 @@ class AdminNotice
             $notices[] = $notice;
         }
 
-        set_transient(static::TRANSIENT_KEY, $notices, YEAR_IN_SECONDS);
-    }
-
-    public static function clearAll()
-    {
-        return delete_transient(static::TRANSIENT_KEY);
+        static::updateNotices($notices);
     }
 }
