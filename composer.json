@@ -25,6 +25,9 @@
             "Laraish\\AdminNotice\\": "src/"
         }
     },
+    "scripts": {
+        "fix-cs": ["prettier **/*.php --write"]
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }

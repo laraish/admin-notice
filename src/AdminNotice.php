@@ -13,23 +13,16 @@ class AdminNotice
             static::outputNotices();
         });
 
-        add_action('wp_ajax_'.static::DISMISS_ACTION, function () {
+        add_action('wp_ajax_' . static::DISMISS_ACTION, function () {
             static::ajaxDismiss();
         });
 
-
         $absolutePath = str_replace('\\', '/', ABSPATH);
-        $assetsDir = str_replace('\\', '/', dirname(__DIR__).'/assets');
+        $assetsDir = str_replace('\\', '/', dirname(__DIR__) . '/assets');
         $assetsUrl = home_url(str_replace($absolutePath, '', $assetsDir));
 
         add_action('admin_enqueue_scripts', function ($hook) use ($assetsUrl) {
-            wp_enqueue_script(
-                'laraish-dismiss-notice',
-                $assetsUrl.'/dismiss-notice.js',
-                ['jquery'],
-                null,
-                true
-            );
+            wp_enqueue_script('laraish-dismiss-notice', $assetsUrl . '/dismiss-notice.js', ['jquery'], null, true);
         });
     }
 
@@ -81,7 +74,6 @@ class AdminNotice
 
         exit("Notice(${noticeId}) dismissed");
     }
-
 
     /**
      * @param  string  $type
@@ -137,7 +129,7 @@ class AdminNotice
     protected static function outputNotices()
     {
         foreach (static::getNotices() as $notice) {
-            $class = 'notice notice-'.$notice['type'].($notice['isDismissible'] ? ' is-dismissible' : '');
+            $class = 'notice notice-' . $notice['type'] . ($notice['isDismissible'] ? ' is-dismissible' : '');
             $message = $notice['message'];
             $noticeId = $notice['id'];
             $dataNoticeId = $noticeId ? "data-notice-id=\"{$noticeId}\"" : '';
